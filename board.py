@@ -32,13 +32,16 @@ class state:
         Stores the locations of known pellets
         '''
         self.pellet_locations = []
+        self.explored_squares = []
 
     '''
     Updates the board at a certain coordinate with a symbol
+    wall = '#'
+    space = ' '
     pellet = 'o'
-    wall = ' ' 
     super pellet = 'O'
-
+    enemy pac = 'e'
+    friendly pac = 'f'
     '''
     def update_board(self,symbol,width,height):
         if self.board[height][width] == '#':
@@ -53,7 +56,7 @@ class state:
         return copy.deepcopy(self.board)
 
     '''
-    Returns the closest pellet available to a coordinate
+    Returns the closest pellet available to a coordinate (last seen by a friendly pac)
     (height,width)
     '''
     def closest_pellet(self, height, width):
