@@ -74,6 +74,14 @@ class state:
         
         return closest_coord
 
+
+    '''
+    Given a coordinate, add all seen squares to the 'explored' list
+    used to generate random moves if all known pellets are eaten
+    '''
+    def explored(self, width, height):
+        pass
+
 # width: size of the grid
 # height: top left corner is (x=0, y=0)
 width, height = [int(i) for i in input().split()]
@@ -101,10 +109,13 @@ while True:
     for i in range(visible_pellet_count):
         # value: amount of points this pellet is worth
         x, y, value = [int(j) for j in input().split()]
+        
+        # Added to update board of values of pellets
         if value > 1:
-            game.update_board('O',)
+            game.update_board('O',x,y)
+        else:
+            game.update_board('o',x,y)
 
 
-    # Everything above this are inputs from the game
 
 
