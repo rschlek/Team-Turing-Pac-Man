@@ -1,10 +1,15 @@
 import sys
 import copy
 
+def err(*args):
+    sys.stderr.write(', '.join([str(arg) for arg in args]) + "\n")
+
 class state:
     def __init__(self, rows, width, height, board=None):
         if board is not None:
             self.board=board
+            self.height = len(board)
+            self.width = len(board[0])
         else:
         
             self.board = []
@@ -16,8 +21,48 @@ class state:
                 for j in range(width):
                     self.board[i].append(rows[i][j])
 
-    def update_board(self,symbol,height,width):
-        self.board[height][width] = symbol
+        self.available_coords = []
 
+        for i in range(height):
+            for j in range(width):
+                if self.board[height][width] != '#':
+                    self.available_coords.append((height,width))
+
+        '''
+        Stores the locations of known pellets
+        '''
+        self.pellet_locations = []
+
+    '''
+    Updates the board at a certain coordinate with a symbol
+    pellet = 'o'
+    wall = ' ' 
+    super pellet = 'O'
+
+    '''
+    def update_board(self,symbol,width,height):
+        if self.board[height][width] == '#':
+            err('Invalid coordinate')
+        else:
+            self.board[height][width] = symbol
+
+    '''
+    Returns a copy of the board that won't change the original instance of the class
+    '''
     def copy_board(self):
         return copy.deepcopy(self.board)
+
+    '''
+    Returns the closest pellet available to a coordinate
+    (height,width)
+    '''
+    def closest_pellet(self, height, width):
+        closest_distance = 10000
+        closest_coord = (-1,-1)
+        for i in range(len(self.pellet_locations)):
+            distance = abs(height-self.pellet_locations[i][0]) + abs(width-self.pellet_locations[i][1])
+            if distance < closest_distance:
+                closest_distance = distance
+                closest_coord = self.pellet_locations[i]
+        
+        return closest_coord
