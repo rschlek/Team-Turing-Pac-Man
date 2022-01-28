@@ -33,6 +33,7 @@ class Pac:
         self.rock = "ROCK"
         self.paper = "PAPER"
         self.scissors = "SCISSORS"
+        self.print_line = ""
 
     '''
     controls the behavior of the Pac automatically provided Pac parameters are updated properly
@@ -81,7 +82,7 @@ class Pac:
     prints the next move the Pac is going to take
     '''
     def next_move(self, next_move: str):
-        print(next_move)
+        self.print_line += next_move
 
     '''
     controls the Pac if an enemy is in sight
@@ -168,8 +169,9 @@ class Pac:
     called from the gameloop when an enemy is in sight.
     @:param enemy: a Pac object of the enemy Pac
     '''
-    def see_enemy(self, enemy):
-        self.pac_chasing = enemy
+    def see_enemy(self, board):
+       # if board.board[][]
+        self.pac_#chasing = enemy
         self.attacking = True
 
     def see_super_pellet(self, pellet_x, pellet_y):
