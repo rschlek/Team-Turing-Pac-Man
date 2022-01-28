@@ -1,3 +1,4 @@
+import random
 import sys
 import math
 
@@ -25,8 +26,9 @@ class Pac:
         self.ability_cooldown = ability_cooldown
         self.speed_turns_left = speed_turns_left
         self.attacking = False
-        self.see_super_pellet = False
+        self.chasing_super_pellet = False
         self.next_destination = None
+        self.pac_chasing = None
         self.ability_meter_full = False
         self.rock = "ROCK"
         self.paper = "PAPER"
@@ -41,12 +43,29 @@ class Pac:
         elif self.ability_cooldown != 0:
             self.ability_meter_full = False
 
-        if self.attacking:
-
-            pass
+        if self.attacking: #make sure to set attacking to false and pac_chasing to None in the game loop if no enemy Pac is in sight #FIXME
+            if self.pac_chasing is not None:
+                self.attack_mode(self.pac_chasing.x, self.pac_chasing.y, self.pac_chasing.type_id)
+            else: self.attacking = False
+            return
 
         elif not self.attacking:
-            pass
+            if not self.chasing_super_pellet: #set to false if super pellet is reached or in game loop
+                closest_pellet = board.closest_pellet(self.y, self.x)
+                next_x = -1
+                next_y = -1
+                for i in closest_pellet:
+                    if i is int:
+                        if next_x > -1:
+                            next_x = i
+                        elif next_y > -1:
+                            next_y = i
+                self.move(next_x, next_y)
+                return
+
+        next_x = random.randint(0, board.width - 1)
+        next_y = random.randint(0, board.height - 1)
+        self.move(next_x, next_y)
 
     '''
     prints the next move the Pac is going to take
@@ -73,9 +92,9 @@ class Pac:
                     self.speed_boost()
                     return
 
-            next_location = self.id_num + " " + enemy_x + " " + enemy_y
+            next_location = enemy_x + " " + enemy_y
             if self.next_destination != next_location:
-                next_destination = next_location
+                self.next_destination = next_location
                 #self.next_move("MOVE " + self.id_num + " " + next_destination)
                 self.move(enemy_x, enemy_y)
                 return
@@ -108,28 +127,29 @@ class Pac:
                 return self.rock
 
 
-    def gather_mode(self):
-        pass
+    # def gather_mode(self): #FIXME
+    #     pass
+    #
+    # def update_ability_meter(self): #FIXME
+    #     if self.ability_cooldown == 0:
+    #         self.meter_full()
+    #         self.ability_cooldown = 9
+    #     else:
+    #         self.ability_cooldown -= 1
+    #
+    # def meter_full(self): #FIXME
+    #     if self.attacking:
+    #         self.change_type()
+    #     else:
+    #         self.speed_boost()
+    #
+    # def get_location(self):  # -> Vector2: #FIXME
+    #     return self.location
+    #
+    # def set_location(self, x, y): #FIXME
+    #     self.location.x = x
+    #     self.location.y = y
 
-    def update_ability_meter(self): #FIXME
-        if self.ability_cooldown == 0:
-            self.meter_full()
-            self.ability_cooldown = 9
-        else:
-            self.ability_cooldown -= 1
-
-    def meter_full(self): #FIXME
-        if self.attacking:
-            self.change_type()
-        else:
-            self.speed_boost()
-
-    def get_location(self):  # -> Vector2: #FIXME
-        return self.location
-
-    def set_location(self, x, y): #FIXME
-        self.location.x = x
-        self.location.y = y
 
     def is_stuck(self) -> bool:
         return False
@@ -141,6 +161,15 @@ class Pac:
     def see_enemy(self, enemy):
         self.pac_chasing = enemy
         self.attacking = True
+
+    def see_super_pellet(self, pellet_x, pellet_y):
+        self.chasing_super_pellet = True
+        if self.x == pellet_x and self.y == pellet_y:
+            self.chasing_super_pellet
+        if self.next_destination != pellet_x + " " + pellet_y:
+            self.next_destination = pellet_x + " " + pellet_y
+            self.move(pellet_x, pellet_y)
+
     '''
     sets the next location the Pac will move to and calls the next_move function to print it
     '''
@@ -161,92 +190,92 @@ class Pac:
     def speed_boost(self):
         self.next_move("SPEED " + self.id_num)
 
-    def check_best_path(self, position, board = None): #FIXME
-        if board is not None:
-            x = position.x
-            y = position.y
-            up_pellets, down_pellets, left_pellets, right_pellets = 0, 0, 0, 0
-            up = ""
-            down = ""
-            left = ""
-            right = ""
-
-            index = board[position.x][position.y]
-            while index != '#':
-                y -= 1
-                index = board[x][y]
-                if index != '#':
-                    up += index + " "
-
-            index = board[position.x][position.y]
-            x = position.x
-            y = position.y
-            while index != '#':
-                y += 1
-                index = board[x][y]
-                if index != '#':
-                    down += index + " "
-
-            index = board[position.x][position.y]
-            x = position.x
-            y = position.y
-            while index != '#':
-                x -= 1
-                index = board[x][y]
-                if index != '#':
-                    left += index + " "
-
-            index = board[position.x][position.y]
-            x = position.x
-            y = position.y
-            while index != '#':
-                x += 1
-                index = board[x][y]
-                if index != '#':
-                    right += index + " "
-
-            for i in up:
-                if i == 'o':
-                    up_pellets += 1
-                elif i == 'O':
-                    up_pellets += 10
-                elif i == 'e':
-                    return "UP"
-
-            for i in down:
-                if i == 'o':
-                    down_pellets += 1
-                elif i == 'O':
-                    down_pellets += 10
-                elif i == 'e':
-                    return "DOWN"
-
-            for i in left:
-                if i == 'o':
-                    left_pellets += 1
-                elif i == 'O':
-                    left_pellets += 10
-                elif i == 'e':
-                    return "LEFT"
-
-            for i in right:
-                if i == 'o':
-                    right_pellets += 1
-                elif i == 'O':
-                    right_pellets += 10
-                elif i == 'e':
-                    return "RIGHT"
-
-            if up_pellets >= down_pellets and up_pellets >= left_pellets and up_pellets >= right_pellets:
-                return "UP"
-
-            if down_pellets >= up_pellets and down_pellets >= left_pellets and down_pellets >= right_pellets:
-                return "DOWN"
-
-            if left_pellets >= up_pellets and left_pellets >= down_pellets and left_pellets >= right_pellets:
-                return "LEFT"
-
-            if right_pellets >= up_pellets and right_pellets >= down_pellets and right_pellets >= left_pellets:
-                return "RIGHT"
+    # def check_best_path(self, position, board = None): #FIXME
+    #     if board is not None:
+    #         x = position.x
+    #         y = position.y
+    #         up_pellets, down_pellets, left_pellets, right_pellets = 0, 0, 0, 0
+    #         up = ""
+    #         down = ""
+    #         left = ""
+    #         right = ""
+    #
+    #         index = board[position.x][position.y]
+    #         while index != '#':
+    #             y -= 1
+    #             index = board[x][y]
+    #             if index != '#':
+    #                 up += index + " "
+    #
+    #         index = board[position.x][position.y]
+    #         x = position.x
+    #         y = position.y
+    #         while index != '#':
+    #             y += 1
+    #             index = board[x][y]
+    #             if index != '#':
+    #                 down += index + " "
+    #
+    #         index = board[position.x][position.y]
+    #         x = position.x
+    #         y = position.y
+    #         while index != '#':
+    #             x -= 1
+    #             index = board[x][y]
+    #             if index != '#':
+    #                 left += index + " "
+    #
+    #         index = board[position.x][position.y]
+    #         x = position.x
+    #         y = position.y
+    #         while index != '#':
+    #             x += 1
+    #             index = board[x][y]
+    #             if index != '#':
+    #                 right += index + " "
+    #
+    #         for i in up:
+    #             if i == 'o':
+    #                 up_pellets += 1
+    #             elif i == 'O':
+    #                 up_pellets += 10
+    #             elif i == 'e':
+    #                 return "UP"
+    #
+    #         for i in down:
+    #             if i == 'o':
+    #                 down_pellets += 1
+    #             elif i == 'O':
+    #                 down_pellets += 10
+    #             elif i == 'e':
+    #                 return "DOWN"
+    #
+    #         for i in left:
+    #             if i == 'o':
+    #                 left_pellets += 1
+    #             elif i == 'O':
+    #                 left_pellets += 10
+    #             elif i == 'e':
+    #                 return "LEFT"
+    #
+    #         for i in right:
+    #             if i == 'o':
+    #                 right_pellets += 1
+    #             elif i == 'O':
+    #                 right_pellets += 10
+    #             elif i == 'e':
+    #                 return "RIGHT"
+    #
+    #         if up_pellets >= down_pellets and up_pellets >= left_pellets and up_pellets >= right_pellets:
+    #             return "UP"
+    #
+    #         if down_pellets >= up_pellets and down_pellets >= left_pellets and down_pellets >= right_pellets:
+    #             return "DOWN"
+    #
+    #         if left_pellets >= up_pellets and left_pellets >= down_pellets and left_pellets >= right_pellets:
+    #             return "LEFT"
+    #
+    #         if right_pellets >= up_pellets and right_pellets >= down_pellets and right_pellets >= left_pellets:
+    #             return "RIGHT"
 
 
