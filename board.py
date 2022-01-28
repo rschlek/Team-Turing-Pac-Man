@@ -70,4 +70,4 @@ class state:
         
         return closest_coord
 
-    def 
+    def as
