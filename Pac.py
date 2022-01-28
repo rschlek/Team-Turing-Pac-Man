@@ -52,19 +52,29 @@ class Pac:
         elif not self.attacking:
             if not self.chasing_super_pellet: #set to false if super pellet is reached or in game loop
                 closest_pellet = board.closest_pellet(self.y, self.x)
-                next_x = -1
-                next_y = -1
-                for i in closest_pellet:
-                    if i is int:
-                        if next_x > -1:
-                            next_x = i
-                        elif next_y > -1:
-                            next_y = i
+                next_x = closest_pellet[0]
+                next_y = closest_pellet[1]
+                # for i in closest_pellet:
+                #     if i is int:
+                #         if next_x > -1:
+                #             next_x = i
+                #         elif next_y > -1:
+                #             next_y = i
                 self.move(next_x, next_y)
                 return
 
+        rand_unexplored = board.random_unexplored()
+        if rand_unexplored is not None:
+            next_x = rand_unexplored[0]
+            next_y = rand_unexplored[1]
+            self.move(next_x, next_y)
+            return
+
         next_x = random.randint(0, board.width - 1)
         next_y = random.randint(0, board.height - 1)
+        while board[next_x][next_y] == '#':
+            next_x = random.randint(0, board.width - 1)
+            next_y = random.randint(0, board.height - 1)
         self.move(next_x, next_y)
 
     '''
@@ -189,93 +199,3 @@ class Pac:
     '''
     def speed_boost(self):
         self.next_move("SPEED " + self.id_num)
-
-    # def check_best_path(self, position, board = None): #FIXME
-    #     if board is not None:
-    #         x = position.x
-    #         y = position.y
-    #         up_pellets, down_pellets, left_pellets, right_pellets = 0, 0, 0, 0
-    #         up = ""
-    #         down = ""
-    #         left = ""
-    #         right = ""
-    #
-    #         index = board[position.x][position.y]
-    #         while index != '#':
-    #             y -= 1
-    #             index = board[x][y]
-    #             if index != '#':
-    #                 up += index + " "
-    #
-    #         index = board[position.x][position.y]
-    #         x = position.x
-    #         y = position.y
-    #         while index != '#':
-    #             y += 1
-    #             index = board[x][y]
-    #             if index != '#':
-    #                 down += index + " "
-    #
-    #         index = board[position.x][position.y]
-    #         x = position.x
-    #         y = position.y
-    #         while index != '#':
-    #             x -= 1
-    #             index = board[x][y]
-    #             if index != '#':
-    #                 left += index + " "
-    #
-    #         index = board[position.x][position.y]
-    #         x = position.x
-    #         y = position.y
-    #         while index != '#':
-    #             x += 1
-    #             index = board[x][y]
-    #             if index != '#':
-    #                 right += index + " "
-    #
-    #         for i in up:
-    #             if i == 'o':
-    #                 up_pellets += 1
-    #             elif i == 'O':
-    #                 up_pellets += 10
-    #             elif i == 'e':
-    #                 return "UP"
-    #
-    #         for i in down:
-    #             if i == 'o':
-    #                 down_pellets += 1
-    #             elif i == 'O':
-    #                 down_pellets += 10
-    #             elif i == 'e':
-    #                 return "DOWN"
-    #
-    #         for i in left:
-    #             if i == 'o':
-    #                 left_pellets += 1
-    #             elif i == 'O':
-    #                 left_pellets += 10
-    #             elif i == 'e':
-    #                 return "LEFT"
-    #
-    #         for i in right:
-    #             if i == 'o':
-    #                 right_pellets += 1
-    #             elif i == 'O':
-    #                 right_pellets += 10
-    #             elif i == 'e':
-    #                 return "RIGHT"
-    #
-    #         if up_pellets >= down_pellets and up_pellets >= left_pellets and up_pellets >= right_pellets:
-    #             return "UP"
-    #
-    #         if down_pellets >= up_pellets and down_pellets >= left_pellets and down_pellets >= right_pellets:
-    #             return "DOWN"
-    #
-    #         if left_pellets >= up_pellets and left_pellets >= down_pellets and left_pellets >= right_pellets:
-    #             return "LEFT"
-    #
-    #         if right_pellets >= up_pellets and right_pellets >= down_pellets and right_pellets >= left_pellets:
-    #             return "RIGHT"
-
-
