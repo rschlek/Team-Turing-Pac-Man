@@ -34,12 +34,19 @@ class Pac:
         self.paper = "PAPER"
         self.scissors = "SCISSORS"
         self.command = ""
+        self.prev_x
+        self. prev_y
 
     '''
     controls the behavior of the Pac automatically provided Pac parameters are updated properly
     '''
     def play(self, board, enemy = None):  # to be called every turn by the gameplayloop in main, this way only one function call must be done on the object and all logic for each pac will run internally
         #self.command = ""
+        stuck = self.is_stuck(board)
+        self.prev_x = self.x
+        self.prev_y = self.y
+        if stuck:
+            return
         if self.ability_cooldown == 0:
             self.ability_meter_full = True
         elif self.ability_cooldown != 0:
@@ -165,7 +172,14 @@ class Pac:
     #     self.location.y = y
 
 
-    def is_stuck(self) -> bool:
+    def is_stuck(self, board):
+        if self.x == self.prev_x and self.y == self.prev_y:
+            rand_unexplored = board.random_unexplored()
+            if rand_unexplored is not None:
+                next_x = rand_unexplored[1]
+                next_y = rand_unexplored[0]
+                self.move(next_x, next_y)
+            return True
         return False
 
     '''
