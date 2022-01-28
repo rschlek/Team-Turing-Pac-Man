@@ -1,12 +1,10 @@
-import sys
-import copy
 import random
+import sys
 import math
+import copy
 
 def err(*args):
     sys.stderr.write(', '.join([str(arg) for arg in args]) + "\n")
-
-
 
 class Pac:
 
@@ -39,25 +37,33 @@ class Pac:
         self.paper = "PAPER"
         self.scissors = "SCISSORS"
         self.command = ""
+        self.prev_x = -1
+        self. prev_y = -1
 
     '''
     controls the behavior of the Pac automatically provided Pac parameters are updated properly
     '''
     def play(self, board, enemy = None):  # to be called every turn by the gameplayloop in main, this way only one function call must be done on the object and all logic for each pac will run internally
-        self.command = ''
+        #self.command = ""
+        stuck = self.is_stuck(board)
+        self.prev_x = self.x
+        self.prev_y = self.y
+        if stuck:
+            return
         if self.ability_cooldown == 0:
             self.ability_meter_full = True
         elif self.ability_cooldown != 0:
             self.ability_meter_full = False
 
-        
         if self.attacking: #make sure to set attacking to false and pac_chasing to None in the game loop if no enemy Pac is in sight #FIXME
             if self.pac_chasing is not None:
                 self.attack_mode(self.pac_chasing.x, self.pac_chasing.y, self.pac_chasing.type_id)
             else: self.attacking = False
             return
-        
+
         elif not self.attacking:
+            if self.ability_meter_full:
+                self.speed_boost()
             if not self.chasing_super_pellet: #set to false if super pellet is reached or in game loop
                 closest_pellet = board.closest_pellet(self.y, self.x)
                 next_x = closest_pellet[1]
@@ -169,30 +175,36 @@ class Pac:
     #     self.location.y = y
 
 
-    def is_stuck(self) -> bool:
+    def is_stuck(self, board):
+        if self.x == self.prev_x and self.y == self.prev_y:
+            rand_unexplored = board.random_unexplored()
+            if rand_unexplored is not None:
+                next_x = rand_unexplored[1]
+                next_y = rand_unexplored[0]
+                self.move(next_x, next_y)
+            return True
         return False
 
     '''
     called from the gameloop when an enemy is in sight.
     @:param enemy: a Pac object of the enemy Pac
     '''
-    def see_enemy(self, board):
-       # if board.board[][]
-       #  self.pac_chasing = enemy
-        x = self.x
-        y = self.y
-
-        while board.board[x][y] != '#':
-            if board.board[x][y] == 'e':
-                self.attacking = True
-                self.pac_chasing = (x, y)
-                return
+    def see_enemy(self, enemy = None):
+        if enemy is not None:
+            self.attacking = True
+            self.pac_chasing = enemy
+        else:
+            self.attacking = False
+            self.pac_chasing = None
 
 
-    def see_super_pellet(self, pellet_x, pellet_y):
+    def see_super_pellet(self, pellet_x = -1, pellet_y = -1):
+        if (pellet_x < 0):
+            self.chasing_super_pellet = False
+            return
         self.chasing_super_pellet = True
         if self.x == pellet_x and self.y == pellet_y:
-            self.chasing_super_pellet
+            self.chasing_super_pellet = False
         if self.next_destination != pellet_x + " " + pellet_y:
             self.next_destination = pellet_x + " " + pellet_y
             self.move(pellet_x, pellet_y)
@@ -208,7 +220,7 @@ class Pac:
     sets the next type the Pac will switch to and calls the next_move function to print it
     '''
     def switch(self, switch_to: str):
-        self.next_move("SWITCH " + str(self.type_id) + " " + switch_to)
+        self.next_move("SWITCH " + self.type_id + " " + switch_to)
         self.type_id = switch_to  # Remove this if type_id is being updated in the game loop FIXME
 
     '''
@@ -349,7 +361,7 @@ class state:
 
     
 
-#temp
+
 
 # Below this line is the game loop information
 
