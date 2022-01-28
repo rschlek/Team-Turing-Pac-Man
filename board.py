@@ -1,9 +1,6 @@
-import sys
-import copy
-
-def err(*args):
-    sys.stderr.write(', '.join([str(arg) for arg in args]) + "\n")
-
+'''
+Class to track the board/state of the game
+'''
 class state:
     def __init__(self, rows, width, height, board=None):
         if board is not None:
@@ -25,14 +22,16 @@ class state:
 
         for i in range(height):
             for j in range(width):
-                if self.board[height][width] != '#':
-                    self.available_coords.append((height,width))
+                if self.board[i][j] != '#':
+                    self.available_coords.append((i,j))
 
         '''
         Stores the locations of known pellets
         '''
         self.pellet_locations = []
         self.explored_squares = []
+
+        self.visited = []
 
     '''
     Updates the board at a certain coordinate with a symbol
@@ -45,7 +44,7 @@ class state:
     '''
     def update_board(self,symbol,width,height):
         if self.board[height][width] == '#':
-            err('Invalid coordinate')
+            err('Invalid coordinate (update_board)')
         else:
             self.board[height][width] = symbol
 
@@ -70,4 +69,54 @@ class state:
         
         return closest_coord
 
-    def as
+    def add_explored(self,width,height):
+        if (width,height) not in self.explored_squares:
+            self.explored_squares.append((width,height))
+        wall = False
+        if width < self.width-1:
+            for i in range(width+1, self.width):
+                if self.board[height][i] == '#':
+                    wall = True
+                if not wall:
+                    self.explored_squares.append((i,height))
+            wall = False
+        if width > 0:
+            for i in reversed(range(0,width)):
+                if self.board[height][i] == '#':
+                    wall = True
+                if not wall:
+                    self.explored_squares.append((i,height))
+            wall = False
+        if height > 0:
+            for i in reversed(range(0,height)):
+                if self.board[i][width] == '#':
+                    wall = True
+                if not wall:
+                    self.explored_squares.append((width,i))
+            wall=False
+        if height<self.height-1:
+            for i in range(height+1,self.height):
+                if self.board[i][width] =='#':
+                    wall = True
+                if not wall:
+                    self.explored_squares.append((width,i))
+            wall=False
+                
+        
+
+
+    def random_unexplored(self):
+        unexplored_coords = copy.deepcopy(self.available_coords)
+        for element in unexplored_coords:
+            if element in self.explored_squares:
+                unexplored_coords.remove(element)
+
+        return random.choice(unexplored_coords)
+
+
+
+    def add_pellet(self, width, height):
+        if self.board[height][width] == '#':
+            err('Invalid coordinate (add_pellet)')
+        else:
+            self.pellet_locations.append((width,height))
