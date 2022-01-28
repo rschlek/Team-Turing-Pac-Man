@@ -69,3 +69,5 @@ class state:
                 closest_coord = self.pellet_locations[i]
         
         return closest_coord
+
+    def 
