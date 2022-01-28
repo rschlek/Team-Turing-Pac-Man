@@ -29,7 +29,7 @@ class state:
 
         for i in range(height):
             for j in range(width):
-                if self.board[height][width] != '#':
+                if self.board[i][j] != '#':
                     self.available_coords.append((height,width))
 
         '''
@@ -49,7 +49,7 @@ class state:
     '''
     def update_board(self,symbol,width,height):
         if self.board[height][width] == '#':
-            err('Invalid coordinate')
+            err('Invalid coordinate (update_board)')
         else:
             self.board[height][width] = symbol
 
@@ -82,6 +82,22 @@ class state:
     def explored(self, width, height):
         pass
 
+    def add_pellet(self, width, height):
+        if self.board[height][width] == '#':
+            err('Invalid coordinate (add_pellet)')
+        else:
+            self.pellet_locations.append((height,width))
+
+
+    
+
+
+
+# Below this line is the game loop information
+
+
+
+
 # width: size of the grid
 # height: top left corner is (x=0, y=0)
 width, height = [int(i) for i in input().split()]
@@ -113,9 +129,9 @@ while True:
         # Added to update board of values of pellets
         if value > 1:
             game.update_board('O',x,y)
+            game.add_pellet(x,y)
         else:
             game.update_board('o',x,y)
+            game.add_pellet(x,y)
 
-
-
-
+    err(game.board)
