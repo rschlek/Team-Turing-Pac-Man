@@ -35,13 +35,14 @@ class Pac:
     '''
     controls the behavior of the Pac automatically provided Pac parameters are updated properly
     '''
-    def play(self, enemy = None):  # to be called every turn by the gameplayloop in main, this way only one function call must be done on the object and all logic for each pac will run internally
+    def play(self, board, enemy = None):  # to be called every turn by the gameplayloop in main, this way only one function call must be done on the object and all logic for each pac will run internally
         if self.ability_cooldown == 0:
             self.ability_meter_full = True
         elif self.ability_cooldown != 0:
             self.ability_meter_full = False
 
         if self.attacking:
+
             pass
 
         elif not self.attacking:
@@ -59,6 +60,7 @@ class Pac:
     def attack_mode(self, enemy_x = -1, enemy_y = -1, enemy_type = None):
         if enemy_x == -1:
             self.attacking = False
+            self.pac_chasing = None
             return
         else:
             next_type = self.switch_to(self.type_id, enemy_type)
