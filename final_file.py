@@ -1,6 +1,7 @@
 import sys
 import copy
 import random
+import math
 
 def err(*args):
     sys.stderr.write(', '.join([str(arg) for arg in args]) + "\n")
@@ -67,7 +68,7 @@ class Pac:
         pass
 
     def speed_boost(self):
-        print(self.id_num + " SPEED")
+        print(str(self.id_num) + " SPEED")
 
     def get_location(self):  # -> Vector2:
         return self.location
@@ -326,7 +327,7 @@ for i in range(height):
 game = state(rows,width,height)
 
 first = True
-our_pacs = {}
+our_pacs = []
 turn_command = ''
 
 # game loop
@@ -349,14 +350,13 @@ while True:
             name = pac_id
             pac = Pac(pac_id,type_id,x,y,True,ability_cooldown,speed_turns_left)
 
-            our_pacs[i] = pac
+            our_pacs.append(pac)
             game.add_explored(x,y)
         if mine and not first:
             our_pacs[pac_id].x = x
             our_pacs[pac_id].y = y
             our_pacs[pac_id].speed_turns_left = speed_turns_left
             our_pacs[pac_id].ability_cooldown = ability_cooldown
-
 
 
     visible_pellet_count = int(input())  # all pellets in sight
@@ -372,4 +372,8 @@ while True:
             game.update_board('o',x,y)
             game.add_pellet(x,y)
 
-    err(game.available_coords,game.random_unexplored())
+    for pac in our_pacs:
+        pac.play()
+        turn_command += pac.command() + '|'
+
+    print(turn_command)
