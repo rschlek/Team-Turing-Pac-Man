@@ -52,6 +52,8 @@ class Pac:
             return
 
         elif not self.attacking:
+            if self.ability_meter_full:
+                self.speed_boost()
             if not self.chasing_super_pellet: #set to false if super pellet is reached or in game loop
                 closest_pellet = board.closest_pellet(self.y, self.x)
                 next_x = closest_pellet[1]
