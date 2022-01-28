@@ -25,7 +25,7 @@ class Pac:
         self.ability_cooldown = ability_cooldown
         self.speed_turns_left = speed_turns_left
         self.attacking = False
-       # self.next_destination = next_destination
+        #self.next_destination = next_destination
 
     def play(self, enemy = None):  # to be called every turn by the gameplayloop in main, this way only one function call must be done on the object and all logic for each pac will run internally
         self.update_ability_meter()
